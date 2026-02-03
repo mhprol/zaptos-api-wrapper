@@ -1,0 +1,19 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "zaptos"
+version = "0.1.0"
+description = "Zaptos WhatsApp API Wrapper with GHL Integration"
+authors = [{name = "Zaptos Wrapper Team"}]
+requires-python = ">=3.11"
+dependencies = [
+    "click",
+    "httpx",
+    "pydantic",
+    "pyyaml"
+]
+
+[project.scripts]
+zaptos = "zaptos.cli:cli"

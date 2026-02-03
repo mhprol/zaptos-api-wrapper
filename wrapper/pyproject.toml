@@ -15,5 +15,14 @@ dependencies = [
     "pyyaml"
 ]
 
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "ruff",
+    "mypy",
+    "types-PyYAML",
+]
+
 [project.scripts]
 zaptos = "zaptos.cli:cli"

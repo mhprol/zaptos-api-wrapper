@@ -1,7 +1,7 @@
 import click
 import os
 import json
-from .config import config
+from .config import config, Config
 from .client import ZaptosClient
 from .ghl import GHLClient
 
@@ -12,6 +12,7 @@ class ContextObj:
         self.ghl_client = None
 
 @click.group()
+@click.option('--profile', help='Use named profile from profiles.yaml')
 @click.option('--instance', help='Override ZAPTOS_INSTANCE')
 @click.option('--token', help='Override ZAPTOS_TOKEN')
 @click.option('--ghl-key', help='Override GHL_API_KEY')
@@ -19,9 +20,12 @@ class ContextObj:
 @click.option('--output', default='json', help='Output format (json)')
 @click.option('--debug/--no-debug', default=False, help='Enable debug logging')
 @click.pass_context
-def cli(ctx, instance, token, ghl_key, ghl_location, output, debug):
+def cli(ctx, profile, instance, token, ghl_key, ghl_location, output, debug):
     """Zaptos WhatsApp API CLI Wrapper"""
     ctx.obj = ContextObj()
+
+    # Load config from profile (or default/env vars)
+    ctx.obj.config = Config.load(profile)
 
     # Update config from options
     if instance:

@@ -284,3 +284,17 @@ def test_generic_methods(client):
         return_value=httpx.Response(200, json={"deleted": True})
     )
     assert client._delete("/some-endpoint") == {"deleted": True}
+
+@respx.mock
+def test_generic_put(client):
+    respx.put("https://api.zaptoswpp.com/test_instance/some-endpoint").mock(
+        return_value=httpx.Response(200, json={"updated": True})
+    )
+    assert client._put("/some-endpoint", json={"foo": "bar"}) == {"updated": True}
+
+    assert json.loads(respx.calls.last.request.content) == {"foo": "bar"}
+
+def test_client_init():
+    c = ZaptosClient("inst", "tok")
+    assert c.base_url == "https://api.zaptoswpp.com/inst"
+    assert c.headers["token"] == "tok"

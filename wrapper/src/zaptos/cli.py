@@ -47,10 +47,6 @@ def cli(ctx, instance, token, ghl_key, ghl_location, output, debug):
             location_id=ctx.obj.config.ghl_location_id
         )
 
-# Helper to format output
-def echo_output(data):
-    click.echo(json.dumps(data, indent=2))
-
 from .endpoints import messages, contacts, campaigns, conversations, templates, webhooks, analytics, flows
 cli.add_command(messages.messages)
 cli.add_command(contacts.contacts)

@@ -16,6 +16,11 @@ class ZaptosClient:
         response.raise_for_status()
         return response.json()
 
+    def _put(self, endpoint: str, json: Dict[str, Any]) -> Dict[str, Any]:
+        response = self.client.put(endpoint, json=json)
+        response.raise_for_status()
+        return response.json()
+
     def _get(self, endpoint: str, params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         response = self.client.get(endpoint, params=params)
         response.raise_for_status()

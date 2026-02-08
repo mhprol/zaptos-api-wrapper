@@ -27,3 +27,8 @@ dev = [
 
 [project.scripts]
 zaptos = "zaptos.cli:cli"
+
+[tool.pytest.ini_options]
+addopts = "-v --cov=zaptos --cov-report=term-missing"
+testpaths = ["tests"]
+python_files = ["test_*.py"]

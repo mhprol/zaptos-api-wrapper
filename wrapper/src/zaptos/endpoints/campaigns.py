@@ -5,7 +5,7 @@ import time
 import uuid
 import os
 from datetime import datetime
-from ..cli import echo_output
+from ..utils import echo_output
 from ..config import config
 
 def get_campaigns_file():

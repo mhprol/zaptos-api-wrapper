@@ -1,7 +1,7 @@
 import click
 import json
 import os
-from ..cli import echo_output
+from ..utils import echo_output
 
 @click.group()
 def messages():

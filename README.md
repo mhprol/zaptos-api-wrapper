@@ -11,30 +11,48 @@ A robust Python CLI wrapper and client library for the Zaptos WhatsApp API, feat
 
 ---
 
-## Features
+## 📖 Table of Contents
 
-- 📤 **Comprehensive Messaging**: Send text, images, videos, audio, documents, stickers, locations, contacts, buttons, lists, and carousels.
-- 🚀 **Campaign Management**: Create and manage bulk messaging campaigns with scheduling and tracking.
+- [Project Description](#project-description)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Quick Start](#quick-start)
+- [CLI Reference](#cli-reference)
+- [API Client Usage](#api-client-usage)
+- [Authentication](#authentication)
+- [Error Handling](#error-handling)
+- [Rate Limits & Best Practices](#rate-limits--best-practices)
+- [Common Workflows](#common-workflows)
+- [Contributing](#contributing)
+- [License](#license)
+
+---
+
+## Project Description
+
+The **Zaptos API Wrapper** provides a unified interface to interact with the Zaptos WhatsApp API. It simplifies sending messages (text, media, interactive), managing campaigns, and syncing contacts with GoHighLevel (GHL).
+
+**Key Features:**
+- 📤 **Messaging**: Send text, images, videos, audio, documents, stickers, locations, contacts, buttons, lists, and carousels.
+- 🚀 **Campaign Management**: Create, start, and track bulk messaging campaigns.
 - 🔗 **GoHighLevel Integration**: Sync contacts and trigger automations directly from GHL tags.
-- 💬 **Conversation Management**: Access and manage inbox conversations programmatically.
-- 🤖 **Chatbot Flows**: Design and deploy chatbot flows (YAML-based).
-- 📊 **Analytics**: View reports and metrics on message delivery and campaign performance.
-- 🛠️ **CLI Power**: Full command-line interface for manual operations and scripting.
+- 💬 **Conversation Management**: Manage inbox conversations programmatically.
+- 🛠️ **CLI Power**: extensive command-line interface for manual operations and scripting.
 
 ## Installation
 
-You can install the package directly from the source:
+Clone the repository and install the package:
 
 ```bash
 # Clone the repository
 git clone https://github.com/your-org/zaptos-api-wrapper.git
-cd zaptos-api-wrapper/wrapper
+cd zaptos-api-wrapper
 
 # Install in editable mode
-pip install -e .
+pip install -e ./wrapper
 
 # For development (includes testing tools)
-pip install -e ".[dev]"
+pip install -e "./wrapper[dev]"
 ```
 
 ## Configuration
@@ -81,7 +99,18 @@ client.send_image(
     caption="Check this out!"
 )
 
-# 3. Send a Carousel
+# 3. Send Buttons (Interactive)
+client.send_buttons(
+    number="5511999999999",
+    title="Choose an option",
+    buttons=[
+        {"type": "reply", "id": "yes", "text": "Yes"},
+        {"type": "reply", "id": "no", "text": "No"}
+    ],
+    description="Please select one"
+)
+
+# 4. Send a Carousel
 cards = [
     {
         "header": "Product A",
@@ -99,11 +128,20 @@ cards = [
 client.send_carousel("5511999999999", cards)
 ```
 
-### CLI Usage
+## CLI Reference
 
 The CLI provides a convenient way to interact with the API from the terminal.
 
-#### Send a Message
+### Global Options
+- `--instance`: Override `ZAPTOS_INSTANCE`.
+- `--token`: Override `ZAPTOS_TOKEN`.
+- `--ghl-key`: Override `GHL_API_KEY`.
+- `--output`: Output format (default: `json`).
+- `--debug`: Enable debug logging.
+
+### Messages (`zaptos messages`)
+
+Send various types of messages.
 
 ```bash
 # Send Text
@@ -112,11 +150,16 @@ zaptos messages send 5511999999999 --text "Hello World"
 # Send Image
 zaptos messages send 5511999999999 --image "https://example.com/pic.jpg" --caption "Nice view"
 
-# Send Carousel (from JSON string)
-zaptos messages send 5511999999999 --carousel '[{"header":"Title","body":"Desc","image":"url","buttons":[{"type":"reply","id":"1","text":"Btn"}]}]'
+# Send Buttons (JSON string)
+zaptos messages send 5511999999999 --buttons '{"title": "Vote", "buttons": [{"type": "reply", "id": "1", "text": "Up"}, {"type": "reply", "id": "2", "text": "Down"}]}'
+
+# Send Carousel (from file)
+zaptos messages send 5511999999999 --carousel carousel.json
 ```
 
-#### Create a Campaign
+### Campaigns (`zaptos campaigns`)
+
+Manage bulk messaging campaigns.
 
 ```bash
 # Create a campaign targeting contacts with a specific GHL tag
@@ -127,24 +170,24 @@ zaptos campaigns create \
 
 # Start the campaign
 zaptos campaigns start <campaign_id>
+
+# Check status
+zaptos campaigns status <campaign_id>
 ```
 
-## CLI Reference
+### Other Commands
+- `zaptos contacts`: Manage contacts and sync with GoHighLevel.
+- `zaptos conversations`: List and manage inbox conversations.
+- `zaptos templates`: Manage message templates.
+- `zaptos webhooks`: Configure and test webhooks.
+- `zaptos analytics`: View delivery reports and usage stats.
+- `zaptos flows`: Manage chatbot flows.
 
-Run `zaptos --help` for a full list of commands.
+Run `zaptos <command> --help` for more details.
 
-- `zaptos messages` - Manage and send messages (text, media, interactive).
-- `zaptos campaigns` - Manage bulk messaging campaigns (create, list, start, pause, stop).
-- `zaptos contacts` - Manage contacts and sync with GoHighLevel.
-- `zaptos conversations` - List and manage inbox conversations.
-- `zaptos templates` - Manage message templates.
-- `zaptos webhooks` - Configure and test webhooks.
-- `zaptos analytics` - View delivery reports and usage stats.
-- `zaptos flows` - Manage chatbot flows.
+## API Client Usage
 
-## API Client Reference
-
-The `ZaptosClient` exposes the following methods for direct API interaction:
+The `ZaptosClient` exposes the following methods:
 
 | Method | Description |
 | :--- | :--- |
@@ -159,6 +202,67 @@ The `ZaptosClient` exposes the following methods for direct API interaction:
 | `send_buttons(number, title, buttons, description)` | Send interactive buttons (max 3). |
 | `send_list(number, title, sections, button_text)` | Send a list menu. |
 | `send_carousel(number, cards)` | Send a carousel with multiple cards. |
+
+## Authentication
+
+The API uses header-based authentication. The client handles this automatically using the `token` parameter.
+
+**Header Format:**
+```http
+token: {secret}
+```
+*Note: Do NOT use `Bearer` prefix.*
+
+## Error Handling
+
+The client uses `httpx` and will raise exceptions for HTTP errors.
+
+- **401 Unauthorized**: Invalid token or instance ID.
+- **404 Not Found**: Invalid endpoint or instance not connected.
+- **5xx Server Error**: API server issues.
+
+**Example Error Handling:**
+```python
+import httpx
+from zaptos.client import ZaptosClient
+
+try:
+    client.send_text("5511999999999", "Hello")
+except httpx.HTTPStatusError as e:
+    print(f"HTTP Error: {e.response.status_code} - {e.response.text}")
+except httpx.RequestError as e:
+    print(f"Request Error: {e}")
+```
+
+## Rate Limits & Best Practices
+
+- **Delays**: When sending bulk messages, introduce a delay between requests (e.g., 5-15 seconds) to avoid being flagged for spam. The CLI campaign runner handles this automatically.
+- **Number Format**: Always use the format `55XXXXXXXXXXX` (Country Code + Area Code + Number). Do not use `+` or `-`.
+- **Media**: Ensure media URLs are publicly accessible.
+
+## Common Workflows
+
+### 1. Loop Through Contacts
+It is common to iterate through a list of contacts and send personalized messages.
+
+```python
+contacts = [
+    {"number": "5511999999999", "name": "Alice"},
+    {"number": "5511888888888", "name": "Bob"}
+]
+
+for contact in contacts:
+    message = f"Hello {contact['name']}, check our new offer!"
+    client.send_text(contact['number'], message)
+    time.sleep(5)  # Respect rate limits
+```
+
+### 2. GHL Sync and Blast
+1. Fetch contacts from GHL using a tag.
+2. Send a message to each contact via Zaptos.
+3. (Optional) Update GHL with the status.
+
+*This workflow is built-in via `zaptos campaigns` CLI.*
 
 ## Contributing
 

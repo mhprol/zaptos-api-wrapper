@@ -1,0 +1,114 @@
+# Getting started
+
+A quick tutorial to get you up and running with Radix Primitives.
+
+## [Implementing a Popover](#implementing-a-popover)
+
+In this quick tutorial, we will install and style the [Popover](/primitives/docs/components/popover) component.
+
+### [1. Install the primitive](#1-install-the-primitive)
+
+Install Radix Primitives from your command line.
+
+```bash
+npm install radix-ui@latest
+```
+
+### [2. Import the parts](#2-import-the-parts)
+
+Import and structure the parts.
+
+```jsx
+// index.jsx
+
+import * as React from "react";
+
+import { Popover } from "radix-ui";
+
+const PopoverDemo = () => (
+  <Popover.Root>
+    <Popover.Trigger>More info</Popover.Trigger>
+
+    <Popover.Portal>
+      <Popover.Content>
+        Some more info…
+        <Popover.Arrow />
+      </Popover.Content>
+    </Popover.Portal>
+  </Popover.Root>
+);
+
+export default PopoverDemo;
+```
+
+### [3. Add your styles](#3-add-your-styles)
+
+Add styles where desired.
+
+```jsx
+// index.jsx
+
+import * as React from "react";
+
+import { Popover } from "radix-ui";
+
+import "./styles.css";
+
+const PopoverDemo = () => (
+  <Popover.Root>
+    <Popover.Trigger className="PopoverTrigger">Show info</Popover.Trigger>
+
+    <Popover.Portal>
+      <Popover.Content className="PopoverContent">
+        Some content
+        <Popover.Arrow className="PopoverArrow" />
+      </Popover.Content>
+    </Popover.Portal>
+  </Popover.Root>
+);
+
+export default PopoverDemo;
+```
+
+```css
+/* styles.css */
+
+.PopoverTrigger {
+  background-color: white;
+
+  border-radius: 4px;
+}
+
+.PopoverContent {
+  border-radius: 4px;
+
+  padding: 20px;
+
+  width: 260px;
+
+  background-color: white;
+}
+
+.PopoverArrow {
+  fill: white;
+}
+```
+
+### [Demo](#demo)
+
+Here's a complete demo.
+
+## [Summary](#summary)
+
+The steps above outline briefly what's involved in using a Radix Primitive in your application.
+
+These components are low-level enough to give you control over how you want to wrap them. You're free to introduce your own high-level API to better suit the needs of your team and product.
+
+In a few simple steps, we've implemented a fully accessible Popover component, without having to worry about many of its complexities.
+
+- Adheres to [WAI-ARIA](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal) design pattern.
+- Can be controlled or uncontrolled.
+- Customize side, alignment, offsets, collision handling.
+- Optionally render a pointing arrow.
+- Focus is fully managed and customizable.
+- Dismissing and layering behavior is highly customizable.
